@@ -118,8 +118,19 @@ function renderTimers(){
 
       <div class="timer-close" onclick="deleteTimer(${timer.id})">✕</div>
       <div class="timer-buttons">
-        <button onclick="toggleTimer(${timer.id})">PAUSA</button>
-        <button onclick="resetTimer(${timer.id})">RESET</button>
+        <button 
+          class="${timer.running ? "btn-pause" : "btn-start"}"
+          onclick="toggleTimer(${timer.id})"
+        >
+          ${timer.running ? "PAUSA" : "INICIAR"}
+        </button>
+
+        <button 
+          class="btn-reset"
+          onclick="resetTimer(${timer.id})"
+        >
+          RESET
+        </button>
       </div>
 
     `
@@ -141,12 +152,34 @@ function toggleTimer(id){
   let timer = timers.find(t => t.id === id)
   timer.running = !timer.running
 
+  renderTimers()
+
 }
 
 function resetTimer(id){
 
   let timer = timers.find(t => t.id === id)
-  timer.remaining = timer.duration
+
+  timer.running = false
+  timer.finished = false
+
+  if(timer.mode === "circuit"){
+
+    timer.phase = "warmup"
+    timer.phaseRemaining = 180
+    timer.exerciseRemaining = timer.duration
+    timer.currentExercise = 0
+
+    timer.label = "CAMINADORA"
+    timer.type = "exercise"
+
+  }else{
+
+    timer.remaining = timer.duration
+
+  }
+
+  renderTimers()
 
 }
 

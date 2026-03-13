@@ -92,7 +92,41 @@ button {
 }
 
 .timer-buttons button {
-    font-size: 16px;
+    font-size: 18px;
+    position: relative;
+    z-index: 2;
+    padding:10px 18px;
+    border:none;
+    border-radius:6px;
+    cursor:pointer;
+    font-weight:bold;
+}
+
+.btn-start{
+  background:#2e7d32;
+  color:white;
+}
+
+.btn-start:hover{
+  background:#43a047;
+}
+
+.btn-pause{
+  background:#c62828;
+  color:white;
+}
+
+.btn-pause:hover{
+  background:#e53935;
+}
+
+.btn-reset{
+  background:#555;
+  color:white;
+}
+
+.btn-reset:hover{
+  background:#777;
 }
 
 .timer-label {
