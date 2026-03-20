@@ -290,7 +290,37 @@ function createSelectedTimer(){
 // WORKOUT DE PLANCHAS
 // =============================
 
-function createPlankWorkout(rounds){
+//Serie de planchas personalizada
+
+function openPlankPanel(){
+  document.getElementById("plankPanel").classList.toggle("hidden")
+}
+
+function closePlankPanel(){
+  document.getElementById("plankPanel").classList.add("hidden")
+}
+
+function startCustomPlank(){
+
+  const plankTime = parseInt(document.getElementById("plankTime").value)
+  const restTime = parseInt(document.getElementById("restTime").value)
+  const rounds = parseInt(document.getElementById("plankRounds").value)
+
+    //  GUARDAR CONFIG
+  localStorage.setItem("plankConfig", JSON.stringify({
+    plankTime,
+    restTime,
+    rounds
+  }))
+
+  createPlankWorkout(rounds, plankTime, restTime)
+
+  closePlankPanel()
+
+
+}
+
+/*function createPlankWorkout(rounds){
 
   let timer = {
 
@@ -316,11 +346,43 @@ function createPlankWorkout(rounds){
   timers.push(timer)
   renderTimers()
 
+}*/
+
+function createPlankWorkout(rounds, plankTime = 60, restTime = 60){
+
+  let timer = {
+
+    id: Date.now(),
+
+    duration: plankTime,
+    remaining: plankTime,
+
+    type: "exercise",
+    label: "PLANCHA",
+
+    running: true,
+    finished: false,
+
+    mode: "plank",
+
+    rounds: rounds,
+    currentRound: 1,
+
+    phase: "plank",
+
+    plankTime: plankTime,
+    restTime: restTime
+
+  }
+
+  timers.push(timer)
+  renderTimers()
+
 }
 
 
 
-function handlePlankTimer(timer){
+/*function handlePlankTimer(timer){
 
   // voz últimos segundos
   if(timer.remaining <= 3 && timer.remaining > 0){
@@ -368,8 +430,65 @@ function handlePlankTimer(timer){
 
   }
 
+}*/
+
+function handlePlankTimer(timer){
+
+  if(timer.remaining <= 3 && timer.remaining > 0){
+    speak(timer.remaining.toString())
+  }
+
+  if(timer.remaining === 0){
+
+    if(timer.phase === "plank"){
+
+      playSound()
+      speak("Descanso")
+
+      timer.phase = "rest"
+      timer.label = "DESCANSO"
+      timer.type = "rest"
+      timer.remaining = timer.restTime // 👈 antes 60
+
+    }else{
+
+      timer.currentRound++
+
+      if(timer.currentRound > timer.rounds){
+
+        timer.finished = true
+        playSound()
+        speak("Terminado")
+        return
+
+      }
+
+      playSound()
+      speak("Plancha")
+
+      timer.phase = "plank"
+      timer.label = "PLANCHA"
+      timer.type = "exercise"
+      timer.remaining = timer.plankTime // 👈 antes 60
+
+    }
+
+  }
+
 }
 
+
+window.onload = () => {
+
+  const saved = JSON.parse(localStorage.getItem("plankConfig"))
+
+  if(saved){
+    document.getElementById("plankTime").value = saved.plankTime
+    document.getElementById("restTime").value = saved.restTime
+    document.getElementById("plankRounds").value = saved.rounds
+  }
+
+}
 
 
 // =============================
@@ -403,7 +522,7 @@ function createGymCircuit(){
       {name:"MAQUINA", time:60}
     ],
 
-    changeTime: 5,
+    changeTime: 10,
     currentExercise: 0
 
   }

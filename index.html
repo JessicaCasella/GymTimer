@@ -8,14 +8,14 @@
   <link rel="stylesheet" href="style.css">
 
   <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-QESFF09HL7"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-QESFF09HL7"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
 
-  gtag('config', 'G-QESFF09HL7');
-</script>
+    gtag('config', 'G-QESFF09HL7');
+  </script>
 </head>
 
 <body>
@@ -30,23 +30,27 @@
     <div class="top-controls">
 
       <button onclick="createTimer(420,'bike','CALENTAMIENTO 7 MIN')">
-      CALENTAMIENTO 7 MIN
+        CALENTAMIENTO 7 MIN
       </button>
 
       <button onclick="createTimer(600,'bike','CALENTAMIENTO 10 MIN')">
-      CALENTAMIENTO 10 MIN
+        CALENTAMIENTO 10 MIN
       </button>
 
       <button onclick="createGymCircuit()">
-      CIRCUITO 15 MIN
+        CIRCUITO 15 MIN
       </button>
 
-      <button onclick="createPlankWorkout(4)">
-      PLANCHAS x4 (1min)
+      <!--<button onclick="createPlankWorkout(4)">
+        PLANCHAS x4 (1min)
       </button>
 
       <button onclick="createPlankWorkout(3)">
-      PLANCHAS x3 (1min)
+        PLANCHAS x3 (1min)
+      </button>-->
+
+      <button onclick="openPlankPanel()">
+        PLANCHAS
       </button>
 
     </div>
@@ -87,7 +91,7 @@
   <!-- BOTON TIMER PERSONALIZADO -->
   <div class="custom-creator">
     <button onclick="openCustomTimer()">
-    TIMER PERSONALIZADO
+      TIMER PERSONALIZADO
     </button>
   </div>
 
@@ -113,6 +117,30 @@
 
   </div>
 
+  <div id="plankPanel" class="custom-panel hidden">
+
+    <div class="custom-time">
+      <label>Plancha (seg)</label>
+      <input type="number" id="plankTime" value="60">
+      <span onclick="closePlankPanel()" style="cursor:pointer;">✕</span>
+    </div>
+
+    <div class="custom-time">
+      <label>Descanso (seg)</label>
+      <input type="number" id="restTime" value="30">
+    </div>
+
+    <div class="custom-time">
+      <label>Series</label>
+      <input type="number" id="plankRounds" value="4">
+    </div>
+
+    <button onclick="startCustomPlank()">
+      EMPEZAR
+    </button>
+
+  </div>
+
 
 
   <!-- FOOTER -->
@@ -120,9 +148,8 @@
 
     <span>Jessica Casella</span>
 
-    <a href="https://www.linkedin.com/in/jessicacaselladuarte/"
-       target="_blank">
-       LinkedIn
+    <a href="https://www.linkedin.com/in/jessicacaselladuarte/" target="_blank">
+      LinkedIn
     </a>
 
   </footer>
