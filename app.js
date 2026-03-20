@@ -403,7 +403,7 @@ function createGymCircuit(){
       {name:"MAQUINA", time:60}
     ],
 
-    changeTime: 5,
+    changeTime: 10,
     currentExercise: 0
 
   }
