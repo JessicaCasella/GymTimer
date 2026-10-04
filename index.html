@@ -3,7 +3,8 @@
 
 <head>
   <meta charset="UTF-8">
-  <link rel="icon" type="image/png" href="logo2.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101211">
   <title>GymTimer</title>
   <link rel="stylesheet" href="style.css">
 
@@ -23,8 +24,9 @@
   <!-- HEADER -->
   <header class="header">
 
-    <div class="logo">
-      <img src="gymtimerlogo.png" alt="GymTimer Logo">
+    <div class="logo" aria-label="GymTimer">
+      <span class="brand-name">GYM<span>TIMER</span><span class="brand-dot">.</span></span>
+      <span class="brand-caption">TU RITMO. TU ENTRENAMIENTO.</span>
     </div>
 
     <div class="top-controls">
@@ -60,10 +62,11 @@
 
 
   <!-- LAYOUT PRINCIPAL -->
-  <div class="layout">
+  <main class="layout">
 
     <!-- BARRA LATERAL DE TIEMPOS -->
-    <div class="side-times">
+    <div class="side-times" aria-label="Tiempos rápidos">
+      <span class="section-label">TIEMPOS RÁPIDOS</span>
 
       <button onclick="createSecondsTimer(15)">15 SEG</button>
       <button onclick="createSecondsTimer(30)">30 SEG</button>
@@ -78,13 +81,21 @@
       <button onclick="createCustomTimer(45)">45 MIN</button>
       <button onclick="createCustomTimer(60)">1 HORA</button>
 
+      <aside class="mobile-access" aria-label="Usar GymTimer en el móvil">
+        <a href="https://jessicacasella.github.io/GymTimer/" aria-label="Abrir GymTimer en el móvil" target="_blank" rel="noopener noreferrer">
+          <img src="gymtimer-qr.svg" width="132" height="132" alt="QR para abrir GymTimer en tu móvil">
+        </a>
+        <strong>ESCANEÁ Y USALO<br>DESDE TU MÓVIL</strong>
+        <span>Tu timer, donde entrenes.</span>
+      </aside>
+
     </div>
 
 
     <!-- TIMERS -->
     <div id="timers"></div>
 
-  </div>
+  </main>
 
 
 
@@ -146,10 +157,8 @@
   <!-- FOOTER -->
   <footer class="footer">
 
-    <span>Jessica Casella</span>
-
-    <a href="https://www.linkedin.com/in/jessicacaselladuarte/" target="_blank">
-      LinkedIn
+    <a href="https://jessicacasella.pages.dev" target="_blank" rel="noopener noreferrer">
+      Diseño &amp; desarrollo · JRC
     </a>
 
   </footer>
