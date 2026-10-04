@@ -14,30 +14,67 @@ let customMinutes = 5
 // SONIDO
 // =============================
 
-function playSound(){
-  const beep = new Audio("sounds/beep.mp3")
-  beep.play()
+// Beep original del proyecto, sin tonos sintetizados.
+let lastSignal = { kind: "", at: -Infinity }
+let voiceQueue = []
+let voiceBusy = false
+
+function audioNotice(message){
+  let notice = document.getElementById("audioNotice")
+  if(!notice){
+    notice = document.createElement("div")
+    notice.id = "audioNotice"
+    notice.setAttribute("role", "status")
+    notice.style.cssText = "padding:12px 20px;color:#ffdf86;font-size:14px"
+    document.querySelector("header").after(notice)
+  }
+  notice.textContent = message
 }
 
+function playSound(kind = "change"){
+  const now = Date.now()
+  // Evitar apilar avisos idénticos de varios temporizadores.
+  if(lastSignal.kind === kind && now - lastSignal.at < 100) return
+  lastSignal = { kind, at: now }
 
+  const beep = new Audio("sounds/beep.mp3")
+  beep.volume = 1
+  function play(){
+    beep.play().then(() => {
+      document.getElementById("audioNotice")?.remove()
+    }).catch(() => audioNotice("El navegador bloqueó el sonido. Tocá un botón y comprobá el volumen del dispositivo."))
+  }
+  play()
+}
 
-// =============================
-// VOZ (TEXT TO SPEECH)
-// =============================
-
+// Las voces se turnan; los conteos atrasados se descartan.
 function speak(text){
+  if(!("speechSynthesis" in window)) return
+  const countdown = /^\d+$/.test(text)
+  if(countdown && (voiceBusy || window.speechSynthesis.speaking || voiceQueue.length)) return
+  if(voiceQueue.some(item => item.text === text)) return
+  voiceQueue.push({ text, expires: Date.now() + (countdown ? 800 : 5000) })
+  flushVoice()
+}
 
-  // cancela cualquier voz anterior
-  speechSynthesis.cancel()
-
-  const msg = new SpeechSynthesisUtterance(text)
+function flushVoice(){
+  if(voiceBusy) return
+  voiceQueue = voiceQueue.filter(item => item.expires > Date.now())
+  const item = voiceQueue.shift()
+  if(!item) return
+  const msg = new SpeechSynthesisUtterance(item.text)
   msg.lang = "es-ES"
   msg.rate = 1
   msg.pitch = 1
-
-  speechSynthesis.speak(msg)
+  voiceBusy = true
+  msg.onend = msg.onerror = () => { voiceBusy = false; flushVoice() }
+  try{
+    window.speechSynthesis.speak(msg)
+  }catch(error){
+    voiceBusy = false
+    flushVoice()
+  }
 }
-
 
 
 // =============================
@@ -225,7 +262,8 @@ setInterval(()=>{
           else if(timer.remaining === 0){
 
             timer.finished = true
-            playSound()
+            timer.running = false
+            playSound("finish")
 
           }
 
@@ -290,14 +328,45 @@ function createSelectedTimer(){
 // WORKOUT DE PLANCHAS
 // =============================
 
-function createPlankWorkout(rounds){
+//Serie de planchas personalizada
+
+function openPlankPanel(){
+  document.getElementById("plankPanel").classList.toggle("hidden")
+}
+
+function closePlankPanel(){
+  document.getElementById("plankPanel").classList.add("hidden")
+}
+
+function startCustomPlank(){
+
+  const plankTime = parseInt(document.getElementById("plankTime").value)
+  const restTime = parseInt(document.getElementById("restTime").value)
+  const rounds = parseInt(document.getElementById("plankRounds").value)
+
+    //  GUARDAR CONFIG
+  localStorage.setItem("plankConfig", JSON.stringify({
+    plankTime,
+    restTime,
+    rounds
+  }))
+
+  createPlankWorkout(rounds, plankTime, restTime)
+
+  closePlankPanel()
+
+
+}
+
+
+function createPlankWorkout(rounds, plankTime = 60, restTime = 60){
 
   let timer = {
 
     id: Date.now(),
 
-    duration: 60,
-    remaining: 60,
+    duration: plankTime,
+    remaining: plankTime,
 
     type: "exercise",
     label: "PLANCHA",
@@ -309,7 +378,11 @@ function createPlankWorkout(rounds){
 
     rounds: rounds,
     currentRound: 1,
-    phase: "plank"
+
+    phase: "plank",
+
+    plankTime: plankTime,
+    restTime: restTime
 
   }
 
@@ -320,16 +393,15 @@ function createPlankWorkout(rounds){
 
 
 
+
 function handlePlankTimer(timer){
 
-  // voz últimos segundos
   if(timer.remaining <= 3 && timer.remaining > 0){
     speak(timer.remaining.toString())
   }
 
   if(timer.remaining === 0){
 
-    // PASAR A DESCANSO
     if(timer.phase === "plank"){
 
       playSound()
@@ -338,19 +410,17 @@ function handlePlankTimer(timer){
       timer.phase = "rest"
       timer.label = "DESCANSO"
       timer.type = "rest"
-      timer.remaining = 60
+      timer.remaining = timer.restTime // 👈 antes 60
 
-    }
-
-    // VOLVER A PLANCHA
-    else{
+    }else{
 
       timer.currentRound++
 
       if(timer.currentRound > timer.rounds){
 
         timer.finished = true
-        playSound()
+        timer.running = false
+        playSound("finish")
         speak("Terminado")
         return
 
@@ -362,7 +432,7 @@ function handlePlankTimer(timer){
       timer.phase = "plank"
       timer.label = "PLANCHA"
       timer.type = "exercise"
-      timer.remaining = 60
+      timer.remaining = timer.plankTime // 👈 antes 60
 
     }
 
@@ -370,6 +440,18 @@ function handlePlankTimer(timer){
 
 }
 
+
+window.onload = () => {
+
+  const saved = JSON.parse(localStorage.getItem("plankConfig"))
+
+  if(saved){
+    document.getElementById("plankTime").value = saved.plankTime
+    document.getElementById("restTime").value = saved.restTime
+    document.getElementById("plankRounds").value = saved.rounds
+  }
+
+}
 
 
 // =============================
@@ -432,7 +514,8 @@ function handleCircuitTimer(timer){
   if(timer.exerciseRemaining <= 0){
 
     timer.finished = true
-    playSound()
+    timer.running = false
+    playSound("finish")
     speak("Circuito terminado")
     return
 
